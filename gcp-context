@@ -1,0 +1,9 @@
+#
+# File: gcp-context
+#
+# Purpose: Provide environment variables for Dokuwiki machine build
+
+GCE_NAME="wiki2"
+GCE_ZONE="us-central1-b"
+WIKI_ADMIN_USER="fred"
+DOMAIN_NAME="example.com"

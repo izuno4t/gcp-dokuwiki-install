@@ -8,24 +8,21 @@
 #  Run within a working GCP SDK project
 #
 
-GCE_NAME="wiki2"
-GCE_ZONE="us-central1-b"
-WIKI_ADMIN_USER="fred"
-DOMAIN_NAME="example.com"
 
 # Ingest environment variables
 source gcp-context
 
 # Inject changes
-sed 's/ADMIN_USER/${WIKI_ADMIN_USER}/' nginx-config
-sec 's/SERVER_DOMAIN_NAME/${DOMAIN_NAME}' nginx-config
+sed -i .foo "s/ADMIN_USER/${WIKI_ADMIN_USER}/g"     nginx-config
+sed -i .foo "s/SERVER_DOMAIN_NAME/${DOMAIN_NAME}/g" nginx-config
 
 
-gcloud compute instances create ${GCE_NAME} --machine-type f1-micro --zone ${GCE_ZONE}
+#gcloud compute instances create ${GCE_NAME} --machine-type f1-micro --zone ${GCE_ZONE}
 
-gcloud compute copy-files remote-setup ${WIKI_ADMIN_USER}@${GCE_NAME}:~/remote-setup
+#gcloud compute copy-files remote-setup ${WIKI_ADMIN_USER}@${GCE_NAME}:~/remote-setup
 
 #gcloud compute ssh ${WIKI_ADMIN_USER}@${GCE_NAME}:~/remote-setup
 
 echo ${GCE_NAME}
 
+cat nginx-config
