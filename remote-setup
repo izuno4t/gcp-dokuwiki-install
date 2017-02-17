@@ -1,0 +1,33 @@
+#
+# File: remote-setup
+#
+# Purpose: Script run on remote Wiki hosting computer
+#
+
+SERVER_DOMAIN_NAME=$1
+ADMIN_USER=$2
+
+# Update APT cache
+sudo apt-get update
+
+# Install Nginx
+sudo apt-get install -y -qq nginx
+
+# Start the Nginx service
+sudo service nginx start
+
+# Install PHP support
+sudo apt-get install -y -qq php5-fpm php5-gd
+
+sudo sed  -i 's/;cgi.fix_pathinfo=0/cgi.fix_pathinfo=2/'  /etc/php5/fpm/php.ini
+
+sudo service php5-fpm restart
+
+sed -i 's/SERVER_DOMAIN_NAME/$SERVER_DOMAIN_NAME/' nginx-config
+sed -i 's/ADMIN_USER/$ADMIN_USER/' nginx-config
+
+# Overwrite the current default configuration
+sudo cp nginx-config /etc/nginx/sites-available/default
+
+
+

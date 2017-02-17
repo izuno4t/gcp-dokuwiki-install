@@ -1,0 +1,62 @@
+server {
+	listen 80;
+	server_name SERVER_DOMAIN_NAME;
+	return 301 https://$server_name$request_uri;
+	}
+
+server {
+	listen 443 ssl;
+
+	server_name SERVER_DOMAIN_NAME;
+
+	ssl_certificate     /home/ADMIN_USER/certbot/cert-config/archive/SERVER_DOMAIN_NAME/fullchain1.pem;
+	ssl_certificate_key /home/ADMIN_USER/certbot/cert-config/archive/SERVER_DOMAIN_NAME/privkey1.pem;
+
+	root /usr/share/nginx/html;
+
+	index index.php index.html index.htm index.nginx-debian.html;
+
+	location / {
+		try_files $uri $uri/ /index.html;
+	}
+
+	error_page 404 /404.html;
+
+	error_page 500 502 503 504 /50x.html;
+	location /50x.html {
+		root /usr/share/nginx/html;
+	}
+
+    location ~ /\.ht
+        deny all;
+    }
+
+	# The following directories must not be accessible directly from outside
+
+	location /data/ {
+		deny all;
+	}
+
+	location /conf/ {
+		deny all;
+	}
+
+	location /bin/ {
+		deny all;
+	}
+
+	location /inc/ {
+		deny all;
+	}
+
+
+
+	location ~ \.php$ {
+		try_files $uri =404;
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_index index.php;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		include fastcgi_params;
+	}
+
+}

@@ -1,0 +1,25 @@
+#!/bin/bash 
+
+# File: install-dokuwiki
+#
+# Purpose: Script that will create a new GCE instance and install a secure Dokuwiki service
+#
+# Requirements:
+#  Run within a working GCP SDK project
+#
+
+GCE_NAME="wiki2"
+GCE_ZONE="us-central1-b"
+WIKI_ADMIN_USER="fred"
+
+# Ingest environment variables
+source gcp-context
+
+gcloud compute instances create ${GCE_NAME} --machine-type f1-micro --zone ${GCE_ZONE}
+
+gcloud compute copy-files remote-setup ${WIKI_ADMIN_USER}@${GCE_NAME}:~/remote-setup
+
+echo ${GCE_NAME}
+
+
+
