@@ -7,22 +7,27 @@
 # Requirements:
 #  Run within a working GCP SDK project
 #
-
+#  >> We need to deal with the fixed external IP <<
+#
 
 # Ingest environment variables
 source gcp-context
 
+
+echo "Removing ${GCE_NAME} from zone ${GCE_ZONE} if it exists"
+gcloud compute instances delete ${GCE_NAME} --zone ${GCE_ZONE}  --no-user-output-enabled  --quiet --verbosity=none
+
+
 # Inject changes
 sed -i .foo "s/ADMIN_USER/${WIKI_ADMIN_USER}/g"     nginx-config
 sed -i .foo "s/SERVER_DOMAIN_NAME/${DOMAIN_NAME}/g" nginx-config
+set -i .foo "s/SERVER_DOMAIN_NAME/${DOMAIN_NAME}/g" remote-setup
 
+echo "Creating ${GCE_NAME} in   zone ${GCE_ZONE}"
+gcloud compute instances create ${GCE_NAME} --machine-type f1-micro --zone ${GCE_ZONE} --no-user-output-enabled  --quiet 
 
-#gcloud compute instances create ${GCE_NAME} --machine-type f1-micro --zone ${GCE_ZONE}
+echo "Copying remote setup files to ${GCE_NAME} for admin user {$WIKI_ADMIN_USER}"
+gcloud compute copy-files remote-setup ${WIKI_ADMIN_USER}@${GCE_NAME}:~/remote-setup
+gcloud compute copy-files nginx-config ${WIKI_ADMIN_USER}@${GCE_NAME}:~/nginx-config
 
-#gcloud compute copy-files remote-setup ${WIKI_ADMIN_USER}@${GCE_NAME}:~/remote-setup
-
-#gcloud compute ssh ${WIKI_ADMIN_USER}@${GCE_NAME}:~/remote-setup
-
-echo ${GCE_NAME}
-
-cat nginx-config
+gcloud compute ssh ${WIKI_ADMIN_USER}@${GCE_NAME}:~/remote-setup
